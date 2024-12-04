@@ -352,9 +352,11 @@ def call_openai(prompt, dataset):
                 "content": prompt
             }
         ]
+
+        api_key = os.getenv('OPENAI_API_KEY')
         
         # Call OpenAI's API
-        client = OpenAI()
+        client = OpenAI(api_key = api_key)
         completion = client.chat.completions.create(
             model="gpt-4o",  # Replace with the desired model
             messages=messages
@@ -369,18 +371,18 @@ def call_openai(prompt, dataset):
 
 
 if __name__ == "__main__":
-    # corpus = ["Food.json"]
-    #         #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-    # runner = ProjectRunner()
-    # for topic in corpus:
-    #    runner.run_indexer_from_specific_field(topic)
+    corpus = ["Food.json"]
+            #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+    runner = ProjectRunner()
+    for topic in corpus:
+       runner.run_indexer_from_specific_field(topic)
     app.run()
 
-corpus = ["Food.json","Health.json"]
-        #   ,"Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-runner = ProjectRunner()
-for topic in corpus:
-    runner.run_indexer_from_specific_field(topic)
+# corpus = ["Food.json","Health.json"]
+#         #   ,"Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+# runner = ProjectRunner()
+# for topic in corpus:
+#     runner.run_indexer_from_specific_field(topic)
 
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
