@@ -15,9 +15,10 @@ import json
 import random
 from flask import Flask
 from flask import request
-
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  
 
 
 class ProjectRunner:
@@ -304,34 +305,20 @@ def saveOutput(output, topic):
     doc_ids = output['daatAndSkipTfIdf']['results'][:10]
 
     # Map document IDs to the corresponding documents in food.json
-    output_food = {}
+    output_food = []
 
     for doc_id in doc_ids:
         # Since the doc_id in the food list is based on the index (starting from 1), we map accordingly
         if doc_id - 1 < len(food_list):  # Check if doc_id exists in the food list
-            output_food[doc_id] = food_list[doc_id - 1]
+            output_food.append(food_list[doc_id - 1])
         else:
-            output_food[doc_id] = {}
+            output_food = []
 
-# Save the output to output_food.json
-    with open('output_food.json', 'w') as output_file:
-        json.dump(output_food, output_file, indent=4)
-    print("Mapped output saved to output_food.json nad returned the result")
+# # Save the output to output_food.json
+#     with open('output_food.json', 'w') as output_file:
+#         json.dump(output_food, output_file, indent=4)
+#     print("Mapped output saved to output_food.json nad returned the result")
     return output_food
-
-# def index(corpus):
-#     projectRunner = ProjectRunner()
-#     projectRunner.run_indexer_from_specific_field(corpus)
-
-#     user_input = input("Please enter your query: ")
- 
-#     topic = "Food"
-#     output = projectRunner.run_queries(user_input,topic)
-#     doc_ids = output['daatAndSkipTfIdf']['results']
-#     print("Output:",doc_ids)
-#     saveOutput(output, topic)
-# index("Health.json")
-# index("Food.json")
 
 
 # Function to interact with OpenAI
@@ -356,6 +343,7 @@ def call_openai(prompt, dataset):
         api_key = os.getenv('OPENAI_API_KEY')
         
         # Call OpenAI's API
+
         client = OpenAI(api_key = api_key)
         completion = client.chat.completions.create(
             model="gpt-4o",  # Replace with the desired model
@@ -370,25 +358,15 @@ def call_openai(prompt, dataset):
         return f"Error communicating with OpenAI {e}"
 
 
-if __name__ == "__main__":
-    # corpus = ["Food.json"]
-    #         #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-    # runner = ProjectRunner()
-    # for topic in corpus:
-    #    runner.run_indexer_from_specific_field(topic)
-    app.run()
-
-corpus = ["Food.json"]
-        #   ,"Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-runner = ProjectRunner()
-for topic in corpus:
-    runner.run_indexer_from_specific_field(topic)
 
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
-    # Get input from the request
+
     query = request.json.get("query")
     topic = request.json.get("topic")
+
+    print("query",query);
+    print("topic",topic);
 
     # Run your indexer logic to get the dataset (simulate with a dictionary)
     output = runner.run_queries(query, topic)  # Your existing runner logic
@@ -404,4 +382,43 @@ def execute_query():
         "query_response": openai_response,
         "docReturned": dataset  # Include the original output_dict for reference
     }
+
+
+
+    
     return jsonify(response)
+
+
+# if __name__ == "__main__":
+#     corpus = ["Food.json"]
+#             #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+#     runner = ProjectRunner()
+#     for topic in corpus:
+#        runner.run_indexer_from_specific_field(topic)
+#     print("Hey")
+#     app.run(debug=True)
+
+corpus = ["Food.json"]
+        #   ,"Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+runner = ProjectRunner()
+for topic in corpus:
+    runner.run_indexer_from_specific_field(topic)
+
+app.run()
+
+
+# def index(corpus):
+#     projectRunner = ProjectRunner()
+#     projectRunner.run_indexer_from_specific_field(corpus)
+
+#     user_input = input("Please enter your query: ")
+ 
+#     topic = "Food"
+#     output = projectRunner.run_queries(user_input,topic)
+#     doc_ids = output['daatAndSkipTfIdf']['results'][:10]
+#     answer = call_openai(user_input, doc_ids)
+#     print("Output:",doc_ids)
+#     print("Answer:",answer)
+#     saveOutput(output, topic)
+# # index("Health.json")
+# index("Food.json")
