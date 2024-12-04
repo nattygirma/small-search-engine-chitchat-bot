@@ -367,7 +367,7 @@ def call_openai(prompt, dataset):
         return reply
     except Exception as e:
         print(f"Error communicating with OpenAI: {e}")
-        return "Error communicating with OpenAI"
+        return f"Error communicating with OpenAI {e}"
 
 
 if __name__ == "__main__":
