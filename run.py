@@ -376,6 +376,10 @@ if __name__ == "__main__":
        runner.run_indexer_from_specific_field(topic)
     app.run()
 
+runner = ProjectRunner()
+for topic in corpus:
+    runner.run_indexer_from_specific_field(topic)
+
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
     # Get input from the request
