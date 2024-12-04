@@ -367,6 +367,15 @@ def call_openai(prompt, dataset):
         print(f"Error communicating with OpenAI: {e}")
         return "Error communicating with OpenAI"
 
+
+if __name__ == "__main__":
+    corpus = ["Food.json"]
+            #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+    runner = ProjectRunner()
+    for topic in corpus:
+       runner.run_indexer_from_specific_field(topic)
+    app.run()
+
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
     # Get input from the request
@@ -388,10 +397,3 @@ def execute_query():
         "docReturned": dataset  # Include the original output_dict for reference
     }
     return jsonify(response)
-
-if __name__ == "__main__":
-    corpus = ["Food.json","Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-    runner = ProjectRunner()
-    for topic in corpus:
-       runner.run_indexer_from_specific_field(topic)
-    app.run()
