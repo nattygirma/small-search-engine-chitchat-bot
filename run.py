@@ -92,6 +92,7 @@ class ProjectRunner:
         if(True):
             # 1. Pre-process & tokenize the query
             input_term_arr = self.preprocessor.preprocess_query(query)
+            print("0")
 
             # Initialize lists for storing postings and skip postings
             daat_and_result = None
@@ -132,16 +133,19 @@ class ProjectRunner:
                 daat_and_skip_result = self.linkedlist_to_array(daat_and_skip_result_l)
           
             # 4. Sort DAAT AND results by TF-IDF (if needed)
+            print("1")
             daat_and_tfidf_result = self.sort_by_tfidf(daat_and_result)
             daat_and_skip_tfidf_result = self.sort_by_tfidf(daat_and_skip_result)
             # daat_and_skip_tfidf_result = self.sort_by_tfidf(daat_and_result)
 
             # Calculate number of docs in results
             num_docs_daat = len(daat_and_result)
+            print("2")
             # num_docs_daat_skip = len(daat_and_result)
             num_docs_daat_skip = len(daat_and_skip_result)
             num_docs_daat_tfidf = len(daat_and_tfidf_result)
             num_docs_daat_skip_tfidf = len(daat_and_skip_tfidf_result)
+            print("3")
 
             # Store the DAAT AND results and their tf-idf sorted versions with the required format
             # output_dict['daatAnd'][query] = {
@@ -361,6 +365,7 @@ def call_openai(prompt, dataset):
 
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
+    print("hello")
 
     query = request.json.get("query")
     topic = request.json.get("topic")
@@ -371,7 +376,7 @@ def execute_query():
     # Run your indexer logic to get the dataset (simulate with a dictionary)
     output = runner.run_queries(query, topic)  # Your existing runner logic
     
-
+    print("hello")
     doc_ids = output['daatAndSkipTfIdf']['results']
     print("Output:",doc_ids)
     dataset = saveOutput(output, topic)
