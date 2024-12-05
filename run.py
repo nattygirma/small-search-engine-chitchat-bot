@@ -104,12 +104,12 @@ class ProjectRunner:
 
             for term in input_term_arr:
                 # 2. Retrieve postings list and skip postings list for each term
-                postings_list = self.get_postings_list(term,topic)
+                # postings_list = self.get_postings_list(term,topic)
                 skip_postings_list = self.get_skip_postings_list(term, topic)
                 skip_postings_linkedList = self.get_skip_postings_linkedList(term, topic)
 
-                if postings_list is None:
-                    postings_list = []  # Handle missing term by setting an empty list
+                # if postings_list is None:
+                #     postings_list = []  # Handle missing term by setting an empty list
                 if skip_postings_list is None:
                     skip_postings_list = []
                 if skip_postings_linkedList is None:
@@ -119,11 +119,11 @@ class ProjectRunner:
                 # output_dict['postingsListSkip'][term] = [doc_id for doc_id, _ in skip_postings_list]
             
                 # 3. For DAAT AND operation, intersect postings list and skip postings list
-                if daat_and_result is None:
-                    daat_and_result = postings_list
-                else:
-                    daat_and_result, comparisons = self.daat_and(daat_and_result, postings_list)
-                    daat_and_comparisons += comparisons
+                # if daat_and_result is None:
+                #     daat_and_result = postings_list
+                # else:
+                #     daat_and_result, comparisons = self.daat_and(daat_and_result, postings_list)
+                #     daat_and_comparisons += comparisons
 
                 if daat_and_skip_result_l is None:
                     daat_and_skip_result_l = skip_postings_linkedList
@@ -134,18 +134,18 @@ class ProjectRunner:
           
             # 4. Sort DAAT AND results by TF-IDF (if needed)
             print("1")
-            daat_and_tfidf_result = self.sort_by_tfidf(daat_and_result)
+            # daat_and_tfidf_result = self.sort_by_tfidf(daat_and_result)
             daat_and_skip_tfidf_result = self.sort_by_tfidf(daat_and_skip_result)
             # daat_and_skip_tfidf_result = self.sort_by_tfidf(daat_and_result)
 
             # Calculate number of docs in results
-            num_docs_daat = len(daat_and_result)
-            print("2")
-            # num_docs_daat_skip = len(daat_and_result)
-            num_docs_daat_skip = len(daat_and_skip_result)
-            num_docs_daat_tfidf = len(daat_and_tfidf_result)
-            num_docs_daat_skip_tfidf = len(daat_and_skip_tfidf_result)
-            print("3")
+            # num_docs_daat = len(daat_and_result)
+            # print("2")
+            # # num_docs_daat_skip = len(daat_and_result)
+            # num_docs_daat_skip = len(daat_and_skip_result)
+            # num_docs_daat_tfidf = len(daat_and_tfidf_result)
+            # num_docs_daat_skip_tfidf = len(daat_and_skip_tfidf_result)
+            # print("3")
 
             # Store the DAAT AND results and their tf-idf sorted versions with the required format
             # output_dict['daatAnd'][query] = {
@@ -168,8 +168,9 @@ class ProjectRunner:
 
             output_dict['daatAndSkipTfIdf'] = {
                 'num_comparisons': daat_and_skip_comparisons,  # Same as DAAT AND with Skip
-                'num_docs': num_docs_daat_skip_tfidf,
-                'results': [doc_id for doc_id, _ in daat_and_skip_tfidf_result]
+                # 'num_docs': num_docs_daat_skip_tfidf,
+                'results': [doc_id for doc_id, _ in daat_and_skip_tfidf_result],
+                'everything':daat_and_skip_tfidf_result
             }
 
         # output_dict['postingsList'] = dict(sorted(output_dict['postingsList'].items()))
@@ -307,16 +308,30 @@ def saveOutput(output, topic):
 
    # Get the results from daatAndSkipTfIdf for the topic 'British cuisine'
     doc_ids = output['daatAndSkipTfIdf']['results'][:10]
+    everything = output['daatAndSkipTfIdf']['everything'][:10]
+
+    # tf_idf = [item[1] for item in everything]
+
 
     # Map document IDs to the corresponding documents in food.json
     output_food = []
 
-    for doc_id in doc_ids:
-        # Since the doc_id in the food list is based on the index (starting from 1), we map accordingly
-        if doc_id - 1 < len(food_list):  # Check if doc_id exists in the food list
-            output_food.append(food_list[doc_id - 1])
-        else:
-            output_food = []
+    # for doc_id in doc_ids:
+    #     # Since the doc_id in the food list is based on the index (starting from 1), we map accordingly
+    #     if doc_id - 1 < len(food_list):  # Check if doc_id exists in the food list
+    #         output_food.append((doc_id,food_list[doc_id - 1]))
+    #     else:
+    #         output_food = []
+
+    for doc_id, tf_idf in everything:
+        if doc_id - 1 < len(food_list):  # Ensure valid index
+            # Create a new object by updating the original food item
+            food_item = food_list[doc_id - 1].copy()  # Copy the food object to avoid modifying the original
+            food_item.update({
+                "doc_id": doc_id,
+                "tf_idf": tf_idf
+            })
+            output_food.append(food_item)
 
 # # Save the output to output_food.json
 #     with open('output_food.json', 'w') as output_file:
@@ -324,26 +339,21 @@ def saveOutput(output, topic):
 #     print("Mapped output saved to output_food.json nad returned the result")
     return output_food
 
-
-# Function to interact with OpenAI
-def call_openai(prompt, dataset):
+def classify(query):
     try:
         # Preparing messages for OpenAI
+
         messages = [
             {
                 "role": "system",
-                "content": "You are assistant, your name is X. You will be given a dataset to answer questions on. If you are not given a dataset, just engage in short conversation."
+                "content": "You are topic classifier, your topics are Food,Health,Economy,Education,Entertainment,Environment,Politics,Sports,Technology,Travel,General ,you can replay with multi topics separated by a comma remember only respond with the topic nothing else"
             },
             {
                 "role": "system",
-                "content": json.dumps(dataset)
+                "content": query
             },
-            {
-                "role": "user",
-                "content": prompt
-            }
         ]
-
+        # print("sending thia to openai",messages)
         api_key = os.getenv('OPENAI_API_KEY')
         
         # Call OpenAI's API
@@ -362,34 +372,77 @@ def call_openai(prompt, dataset):
         return f"Error communicating with OpenAI {e}"
 
 
-@app.route("/execute", methods=['POST'])
+# Function to interact with OpenAI
+def call_openai(m, dataset):
+    try:
+        # Preparing messages for OpenAI
+
+        messages = [
+            {
+                "role": "system",
+                "content": "You are assistant, your name is X. You will be given a dataset to Summarize. If you are not given a dataset, just engage in short conversation."
+            },
+            {
+                "role": "system",
+                "content": json.dumps(dataset)
+            },
+        ]
+        messages.extend(m)
+        print("sending thia to openai",messages)
+        api_key = os.getenv('OPENAI_API_KEY')
+        
+        # Call OpenAI's API
+
+        client = OpenAI(api_key = api_key)
+        completion = client.chat.completions.create(
+            model="gpt-4o",  # Replace with the desired model
+            messages=messages
+        )
+        
+        # Extract the reply
+        reply = completion.choices[0].message.content
+        return reply
+    except Exception as e:
+        print(f"Error communicating with OpenAI: {e}")
+        return f"Error communicating with OpenAI {e}"
+
+
+@app.route("/topic_classification", methods=['POST'])
 def execute():
-    print("called")
-    return "called"
+    query = request.json.get("query")
+    replay = classify(query)
+    return jsonify(replay)
 
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
     print("hello")
 
     query = request.json.get("query")
-    topic = request.json.get("topic")
+    topics = request.json.get("topic")
+    messages = request.json.get("messages")
 
     print("query",query);
-    print("topic",topic);
+    print("topic",topics);
 
-    # Run your indexer logic to get the dataset (simulate with a dictionary)
-    output = runner.run_queries(query, topic)  # Your existing runner logic
-    
-    print("hello")
-    doc_ids = output['daatAndSkipTfIdf']['results']
-    print("Output:",doc_ids)
-    dataset = saveOutput(output, topic)
-    openai_response = call_openai(query, dataset)
+    topic_values = [topic["value"] for topic in topics]  # Extract 'value' from each {value, label}
+    print("topic values",topic_values);
+   #   Run your indexer logic for each topic value
+    combined_output = []  # To store results for each topic 
+    dataset = []
+    for topic_value in topic_values:
+        print("Processing topic:", topic_value)
+        output = runner.run_queries(query, topic_value)  # Pass individual topic value
+        combined_output.append(output)
+        doc_ids = output['daatAndSkipTfIdf']['results']
+        print(f"Output for {topic_value}:",doc_ids)
+        d = saveOutput(output, topic_value)
+        dataset.extend(d)
+    openai_response = call_openai(messages, dataset)
     
     # Respond with OpenAI's output
     response = {
         "query_response": openai_response,
-        "docReturned": dataset  # Include the original output_dict for reference
+        "docReturned": dataset, # Include the original output_dict for reference
     }
 
 
@@ -399,17 +452,16 @@ def execute_query():
 
 
 if __name__ == "__main__":
-    corpus = ["Food.json"]
-            #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-    runner = ProjectRunner()
-    for topic in corpus:
-       runner.run_indexer_from_specific_field(topic)
+    # print("H")
+    # corpus = ["Food.json","Sports.json"]
+    #         #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+    # runner = ProjectRunner()
+    # for topic in corpus:
+    #    runner.run_indexer_from_specific_field(topic)
     print("Hey")
     app.run(debug=True)
 
-corpus = ["Food.json"]
-print("Hey")
-        #   ,"Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+corpus = ["Food.json", "Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
 runner = ProjectRunner()
 for topic in corpus:
     runner.run_indexer_from_specific_field(topic)
