@@ -470,12 +470,6 @@ if __name__ == "__main__":
 
 
 
-@app.route("/execute2", methods=['POST'])
-def execute_1():
-    print("called2")
-    return "calle2"
-
-
 
 # def index(corpus):
 #     projectRunner = ProjectRunner()
