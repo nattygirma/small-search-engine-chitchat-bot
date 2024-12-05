@@ -413,6 +413,15 @@ def execute():
     replay = classify(query)
     return jsonify(replay)
 
+@app.route("/index", methods=['POST'])
+def execute1():
+    corpus = ["Food.json","Sports.json"]
+            #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+    runner = ProjectRunner()
+    for topic in corpus:
+       runner.run_indexer_from_specific_field(topic)
+    print("Hey")
+
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
     print("hello")
@@ -454,13 +463,13 @@ def execute_query():
 
 if __name__ == "__main__":
     print("H")
-    corpus = ["Food.json","Sports.json"]
-            #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+    # corpus = ["Food.json","Sports.json"]
+    #         #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
     runner = ProjectRunner()
-    for topic in corpus:
-       runner.run_indexer_from_specific_field(topic)
-    print("Hey")
-    # app.run(debug=True)
+    # for topic in corpus:
+    #    runner.run_indexer_from_specific_field(topic)
+    # print("Hey")
+    app.run(debug=True)
 
 # corpus = ["Food.json", "Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
 # runner = ProjectRunner()
