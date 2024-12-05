@@ -430,13 +430,14 @@ def execute_query():
     combined_output = []  # To store results for each topic 
     dataset = []
     for topic_value in topic_values:
-        print("Processing topic:", topic_value)
-        output = runner.run_queries(query, topic_value)  # Pass individual topic value
-        combined_output.append(output)
-        doc_ids = output['daatAndSkipTfIdf']['results']
-        print(f"Output for {topic_value}:",doc_ids)
-        d = saveOutput(output, topic_value)
-        dataset.extend(d)
+        if(topic_value != "General"):
+            print("Processing topic:", topic_value)
+            output = runner.run_queries(query, topic_value)  # Pass individual topic value
+            combined_output.append(output)
+            doc_ids = output['daatAndSkipTfIdf']['results']
+            print(f"Output for {topic_value}:",doc_ids)
+            d = saveOutput(output, topic_value)
+            dataset.extend(d)
     openai_response = call_openai(messages, dataset)
     
     # Respond with OpenAI's output
@@ -452,21 +453,21 @@ def execute_query():
 
 
 if __name__ == "__main__":
-    # print("H")
-    # corpus = ["Food.json","Sports.json"]
-    #         #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-    # runner = ProjectRunner()
-    # for topic in corpus:
-    #    runner.run_indexer_from_specific_field(topic)
+    print("H")
+    corpus = ["Food.json","Sports.json"]
+            #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+    runner = ProjectRunner()
+    for topic in corpus:
+       runner.run_indexer_from_specific_field(topic)
     print("Hey")
     app.run(debug=True)
 
-corpus = ["Food.json", "Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-runner = ProjectRunner()
-for topic in corpus:
-    runner.run_indexer_from_specific_field(topic)
-print("Hey2")
-# app.run()
+# corpus = ["Food.json", "Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+# runner = ProjectRunner()
+# for topic in corpus:
+#     runner.run_indexer_from_specific_field(topic)
+# print("Hey2")
+
 
 
 @app.route("/execute2", methods=['POST'])
