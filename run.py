@@ -362,6 +362,10 @@ def call_openai(prompt, dataset):
         return f"Error communicating with OpenAI {e}"
 
 
+@app.route("/execute", methods=['POST'])
+def execute():
+    print("called")
+    return "called"
 
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
@@ -411,6 +415,13 @@ for topic in corpus:
     runner.run_indexer_from_specific_field(topic)
 print("Hey2")
 app.run()
+
+
+@app.route("/execute2", methods=['POST'])
+def execute_1():
+    print("called2")
+    return "calle2"
+
 
 
 # def index(corpus):
