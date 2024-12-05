@@ -414,7 +414,7 @@ runner = ProjectRunner()
 for topic in corpus:
     runner.run_indexer_from_specific_field(topic)
 print("Hey2")
-app.run()
+# app.run()
 
 
 @app.route("/execute2", methods=['POST'])
