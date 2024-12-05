@@ -462,11 +462,11 @@ if __name__ == "__main__":
     print("Hey")
     app.run(debug=True)
 
-# corpus = ["Food.json", "Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-# runner = ProjectRunner()
-# for topic in corpus:
-#     runner.run_indexer_from_specific_field(topic)
-# print("Hey2")
+corpus = ["Food.json", "Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
+runner = ProjectRunner()
+for topic in corpus:
+    runner.run_indexer_from_specific_field(topic)
+print("Hey2")
 
 
 
