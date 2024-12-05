@@ -453,6 +453,7 @@ def execute_query():
 
 
 if __name__ == "__main__":
+    app.run(debug=True)
     print("H")
     corpus = ["Food.json","Sports.json"]
             #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
@@ -460,7 +461,6 @@ if __name__ == "__main__":
     for topic in corpus:
        runner.run_indexer_from_specific_field(topic)
     print("Hey")
-    app.run(debug=True)
 
 # corpus = ["Food.json", "Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
 # runner = ProjectRunner()
