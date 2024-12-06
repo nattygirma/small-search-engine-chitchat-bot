@@ -1,5 +1,6 @@
 import re
 from tqdm import tqdm
+import threading
 from preprocessor import Preprocessor
 from indexer import Indexer
 from multiTopicIndexer import MultiTopicIndexer
@@ -413,14 +414,24 @@ def execute():
     replay = classify(query)
     return jsonify(replay)
 
+def index_corpus(corpus):
+    """Background task to process indexing."""
+    for topic in corpus:
+        runner.run_indexer_from_specific_field(topic)
+    print("Indexing completed for all topics.")
+
+
 @app.route("/index", methods=['POST'])
 def execute1():
+    print("Index")
     corpus = ["Food.json","Sports.json"]
             #   ,"Health.json","Economy.json","Education.json","Entertainment.json","Environment.json","Politics.json","Sports.json","Technology.json","Travel.json"]
-    runner = ProjectRunner()
-    for topic in corpus:
-       runner.run_indexer_from_specific_field(topic)
+    # runner = ProjectRunner()
+  
+    threading.Thread(target=index_corpus, args=(corpus,)).start()
+    #    runner.run_indexer_from_specific_field(topic)
     print("Hey")
+    return jsonify({"message": "Indexing started"}), 202
 
 @app.route("/execute_query", methods=['POST'])
 def execute_query():
